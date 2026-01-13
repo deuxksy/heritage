@@ -1,0 +1,11 @@
+- resources:
+    cpu: true
+    memory: true
+    disk:
+      - /
+      - /mnt/data1/torrent
+      - /mnt/data2/torrent
+
+- search:
+    provider: google
+    target: _blank

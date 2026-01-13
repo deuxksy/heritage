@@ -1,0 +1,28 @@
+title: The Heritage Collection
+background:
+  image: https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?q=80&w=2070&auto=format&fit=crop
+  brightness: 40
+cardBlur: sm
+theme: dark
+color: zinc
+layout:
+  Infrastructure:
+    style: row
+    columns: 2
+  Acquisition Engines:
+    style: row
+    columns: 2
+  Curatorial Tools:
+    style: row
+    columns: 2
+  Digital Theater:
+    style: row
+    columns: 1
+header:
+  show: true
+  left:
+    - time
+    - greeting:
+        text: "Welcome home, Sir."
+  right:
+    - search
