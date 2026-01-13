@@ -1,5 +1,7 @@
 # --- Version Control ---
 .git/
+.gitignore
+.geminiignore
 
 # --- Media & Binary ---
 *.mkv
@@ -9,21 +11,50 @@
 *.mp3
 *.flac
 *.jpg
+*.jpeg
 *.png
 *.gif
 *.webp
 *.db
 *.sqlite
 *.sqlite3
+*.db-shm
+*.db-wal
+*.jar
+*.zip
+*.tar
+*.gz
+*.7z
+*.rar
+*.pdf
 
-# --- Logs & Cache ---
+# --- Logs, Cache & Temp ---
 *.log
 **/logs/
+**/log/
 **/cache/
 **/tmp/
+**/temp/
+*.pid
+*.lock
 
 # --- Secrets ---
 .env
+.env.*
 *.key
 *.pem
 *.cert
+*_rsa
+id_rsa
+
+# --- JDownloader 2 ---
+jdownloader-2/
+
+# --- Arr Stack & Jellyfin (Generated/Large Data) ---
+prowlarr/
+whisparr/
+stash/
+**/asp/
+**/Sentry/
+torrent/
+

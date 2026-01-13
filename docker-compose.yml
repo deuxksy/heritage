@@ -9,45 +9,72 @@ services:
   homepage:
     image: ghcr.io/gethomepage/homepage:latest
     container_name: homepage
-    ports:
-      - "3000:3000"
-    volumes:
-      - /home/crong/heritage/homepage/config:/app/config
-      - /run/user/1000/podman/podman.sock:/var/run/docker.sock:ro # Podman User Socket
-      - /mnt:/mnt:ro # Storage 위젯용
-    networks:
-      - media-net
     restart: unless-stopped
+    # 호스트의 네트워크 인터페이스(enp3s0, tailscale0 등)에 직접 접근하기 위해 필요
+    network_mode: host
     environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Asia/Ho_Chi_Minh # 호치민 시간대 (시계 위젯용)
       - HOMEPAGE_ALLOWED_HOSTS=*
+      # Podman 사용 시 Docker API 응답을 위해 필요한 경우 추가
+      #- DOCKER_RENAME_CONTAINERS=true
+    volumes:
+      - /home/crong/git/heritage/homepage/config:/app/config
+      # Podman User Socket: Homepage 내부의 Docker 위젯이 컨테이너 상태를 읽을 수 있게 함
+      - /run/user/1000/podman/podman.sock:/var/run/docker.sock:ro
+      # Storage 위젯용: N100 NAS의 디스크 사용량을 대시보드에 표시
+      - /mnt:/mnt:ro
 
   prowlarr:
-    image: ghcr.io/hotio/prowlarr:latest
+    # 공식 GitHub 레지스트리 이미지 사용 (가장 빠르고 정확한 업데이트)
+    image: ghcr.io/hotio/prowlarr
     container_name: prowlarr
+    restart: unless-stopped
     ports:
       - "9696:9696"
     environment:
       - PUID=1000
       - PGID=1000
+      - TZ=Asia/Ho_Chi_Minh
+      # .NET 성능 최적화 (N100 8G 환경에서 불필요한 디버그 로그 및 오버헤드 감소)
+      - COMPlus_EnableDiagnostics=0
     volumes:
+      # 설정 및 SQLite DB 저장소
       - /home/crong/heritage/prowlarr:/config
+      # (선택 사항) 대규모 인덱싱 시 로그 파일이 N100 NAS의 시스템 디스크를 채우지 않도록 별도 관리 권장
+      - /home/crong/logs/heritage/prowlarr:/config/logs
+    # N100 8G 메모리 효율을 위한 가이드라인
+    mem_limit: 1g
     networks:
       - media-net
-    restart: unless-stopped
 
-  # --- 📥 Acquisition Engines (수집 엔진) ---
-  rtorrent-rutorrent:
-    image: docker.io/crazymax/rtorrent-rutorrent:latest
-    container_name: rtorrent-rutorrent
+  # --- 📥 Acquisition Engines (수집 엔진 업그레이드) ---
+  torrent: # 서비스 명칭 단일화
+    image: docker.io/crazymax/rtorrent-rutorrent:latest # Flood UI가 내장된 고성능 아키텍처
+    container_name: torrent
+    # 1. 고부하 시 소켓 부족 방지 (DevOps 필수 설정)
+    ulimits:
+      nproc: 65535
+      nofile:
+        soft: 65535
+        hard: 65535
     environment:
       - PUID=1000
       - PGID=1000
+      - TZ=Asia/Ho_Chi_Minh
+      - RT_INC_PORT=50000 # 인바운드 포트 고정
     ports:
-      - "8080:8080"
+      - "8080:8080"   # ruTorrent Web UI
+      - "8000:8000"   # XMLRPC (Prowlarr, Whisparr 연동 필수 포트)
+      - "50000:50000" # Peer 통신용 (TCP)
+      - "6881:6881/udp" # DHT용
     volumes:
-      - /home/crong/heritage/rtorrent:/data
-      - /mnt/data1/torrent:/downloads      # sda1: Inbound Staging (받는 곳)
-      - /mnt/data2/torrent:/completed_hdd2 # sdb1: The Vault (이동될 곳)
+      - /home/crong/heritage/torrent:/data
+      - /mnt/data1/torrent:/downloads
+      - /mnt/data2/torrent:/completed_hdd2
+    # 2. Podman 환경에서의 안정성을 위한 헬스체크 대기 시간
+    stop_grace_period: 30s
     networks:
       - media-net
     restart: always
@@ -55,64 +82,114 @@ services:
   jdownloader:
     image: docker.io/jlesage/jdownloader-2
     container_name: jdownloader
+    restart: unless-stopped
     ports:
       - "5800:5800"
+      - "5900:5900"
     environment:
-      - PUID=1000
-      - PGID=1000
-      - JAVA_OPTIONS=-Xmx512m -Xms256m -XX:+UseSerialGC # N100 8G 최적화
+      # 1. 권한 설정 (jlesage 이미지는 USER_ID/GROUP_ID 형식을 권장)
+      - USER_ID=1000
+      - GROUP_ID=1000
+      - TZ=Asia/Ho_Chi_Minh
+
+      # 2. UI 및 환경 최적화
+      - DARK_MODE=1              # 야간 작업 시 눈 보호를 위한 다크모드 활성화
+      - KEEP_APP_RUNNING=1       # 앱이 비정상 종료 시 자동으로 다시 실행
+      - DISPLAY_WIDTH=1280       # Web UI 기본 해상도 설정
+      - DISPLAY_HEIGHT=720
+
+      # 3. Java 런타임 최적화 (N100 8G 환경에 맞춘 GC 및 메모리 설정 유지)
+      - JAVA_OPTIONS=-Xmx512m -Xms256m -XX:+UseSerialGC -Djava.awt.headless=false
+
+      # 4. MyJDownloader 연동 (선택 사항: 원격 제어를 위해 권장)
+      - MYJDOWNLOADER_EMAIL=ksymailing@gmail.com
+      - MYJDOWNLOADER_PASSWORD=@yesd03020
     volumes:
-      - /home/crong/heritage/jdownloader-2:/config
-      - /mnt/data1/torrent/jd2_downloads:/output # sda1 활용
+      - /home/crong/git/heritage/jdownloader-2:/config:Z # Fedora SELinux 대응
+      - /mnt/data1/torrent/jd2_downloads:/output:Z      # 다운로드 저장소 (sda1)
+    # N100 메모리 보호를 위한 제한
     mem_limit: 1g
     networks:
       - media-net
-    restart: unless-stopped
 
   # --- 🏛️ Curatorial Tools (기록 및 분류) ---
   whisparr:
-    image: ghcr.io/hotio/whisparr:latest
+    # 공식 GitHub 레지스트리 이미지 사용 (Hotio에서 공식으로 전환)
+    image: ghcr.io/hotio/whisparr:v3
     container_name: whisparr
+    restart: unless-stopped
     ports:
       - "6969:6969"
     environment:
       - PUID=1000
       - PGID=1000
+      - TZ=Asia/Ho_Chi_Minh
+      - UMASK=002              # 파일 권한 무결성을 위한 표준 설정
+      - COMPlus_EnableDiagnostics=0 # .NET 진단 비활성화 (리소스 절약)
     volumes:
-      - /home/crong/heritage/whisparr:/config
+      - /home/crong/git/heritage/whisparr:/config
+      # 데이터 볼륨 (N100 I/O 부하 관리를 위해 필요 시 전용 마운트 고려)
       - /mnt/data1/torrent:/data1
       - /mnt/data2/torrent:/data2
+    mem_limit: 1g             # N100 8G 환경을 고려한 메모리 캡
     networks:
       - media-net
-    restart: unless-stopped
 
   stash:
     image: docker.io/stashapp/stash:latest
     container_name: stash
+    restart: unless-stopped
     ports:
       - "9999:9999"
+    # 1. 하드웨어 가속 (N100의 Intel QuickSync 활용)
+    devices:
+      - /dev/dri:/dev/dri
     environment:
       - STASH_CONFIG_FILE=/config/config.yml
+      # 2. 성능 및 권한 최적화 변수
+      - PUID=1000
+      - PGID=1000
+      - TZ=Asia/Ho_Chi_Minh
+      # 하드웨어 가속을 위한 FFmpeg 환경변수 (이미지 내부 기본값이나 명시 권장)
+      - STASH_FFMPEG_PATH=/usr/bin/ffmpeg
     volumes:
-      - /home/crong/heritage/stash:/config
+      - /home/crong/git/heritage/stash:/config
+      # 3. 데이터 구조 최적화 (사용자 정의 경로 유지)
       - /mnt/data1/torrent:/data1
       - /mnt/data2/torrent:/data2
+      # 4. 캐시 및 생성 파일 전용 볼륨 (성능 향상을 위해 권장)
+      - /home/crong/git/heritage/stash/cache:/cache
+      - /home/crong/git/heritage/stash/generated:/generated
+    # 5. 미디어 인덱싱 시 I/O 부하 관리를 위한 리소스 제한 (N100 8G 배려)
+    mem_limit: 2g
     networks:
       - media-net
-    restart: unless-stopped
 
   # --- 🎭 Digital Theater (전시 및 스트리밍) ---
   jellyfin:
     image: docker.io/jellyfin/jellyfin:latest
     container_name: jellyfin
+    restart: unless-stopped
+    # 1. 하드웨어 가속을 위한 그룹 권한 (Fedora의 render 그룹 GID 확인 필요)
+    # group_add:
+    #   - "107" # 보통 Fedora/CentOS에서 render 그룹의 GID입니다. 'getent group render'로 확인하세요.
     ports:
       - "8096:8096"
     devices:
-      - /dev/dri/renderD128:/dev/dri/renderD128 # Intel QSV 가속
+      # 2. Intel QSV 하드웨어 가속 매핑 (N100 필수 설정)
+      - /dev/dri:/dev/dri
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Asia/Ho_Chi_Minh
+      # 3. 자동 검색 및 네트워크 식별을 위한 서버 URL 명시
+      - JELLYFIN_PublishedServerUrl=http://192.168.1.108:8096
     volumes:
-      - /home/crong/heritage/jellyfin:/config
-      - /mnt/data1/torrent:/data1
-      - /mnt/data2/torrent:/data2
+      - /home/crong/git/heritage/jellyfin/config:/config:Z
+      - /home/crong/git/heritage/jellyfin/cache:/cache:Z # 트랜스코딩 부하 분산을 위한 별도 캐시
+      - /mnt/data1/torrent:/data1:ro # 읽기 전용으로 안전하게 연결
+      - /mnt/data2/torrent:/data2:ro
+    # 4. N100 8G 메모리 효율을 위한 제한
+    mem_limit: 2g
     networks:
       - media-net
-    restart: unless-stopped

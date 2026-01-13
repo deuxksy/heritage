@@ -1,59 +1,62 @@
+# For configuration options and examples, please see:
+# https://gethomepage.dev/configs/services/
+
 - Infrastructure:
     - Prowlarr:
         label: "Search Gateway"
         icon: prowlarr.png
-        href: http://192.168.1.108:9696
+        href: http://{{NAS_IP}}:9696
         container: prowlarr
         widget:
           type: prowlarr
-          url: http://prowlarr:9696
+          url: http://127.0.0.1:9696
           key: {{KEY_PROWLARR}}
 
 - Acquisition Engines:
-    - ruTorrent:
-        label: "Direct Inbound"
-        icon: rutorrent.png
-        href: http://192.168.1.108:8080
-        container: rtorrent-rutorrent
+    - Torrent:
+        label: "Acquistion Node"
+        icon: torrent.png
+        href: http://{{NAS_IP}}:8080
+        container: torrent
         widget:
-          type: rutorrent
-          url: http://rtorrent-rutorrent:8080
+          type: torrent
+          url: http://127.0.0.1:8000
     - JDownloader:
         label: "Web Collector"
         icon: jdownloader.png
-        href: http://192.168.1.108:5800
+        href: http://{{NAS_IP}}:5800
         container: jdownloader
         widget:
           type: jdownloader
-          url: http://jdownloader:5800
+          url: http://127.0.0.1:5800
 
 - Curatorial Tools:
     - Whisparr:
         label: "Content Librarian"
         icon: whisparr.png
-        href: http://192.168.1.108:6969
+        href: http://{{NAS_IP}}:6969
         container: whisparr
         widget:
           type: whisparr
-          url: http://whisparr:6969
+          url: http://127.0.0.1:6969
           key: {{KEY_WHISPARR}}
     - Stash:
         label: "Archive Vault"
         icon: stash.png
-        href: http://192.168.1.108:9999
+        href: http://{{NAS_IP}}:9999
         container: stash
         widget:
           type: stash
-          url: http://stash:9999
-          key: YOUR_STASH_API_KEY
+          url: http://127.0.0.1:9999
+          key: {{KEY_STASH}}
 
 - Digital Theater:
     - Jellyfin:
         label: "The Grand Cinema"
         icon: jellyfin.png
-        href: http://192.168.1.108:8096
+        href: http://{{NAS_IP}}:8096
         container: jellyfin
         widget:
           type: jellyfin
-          url: http://jellyfin:8096
-          key: YOUR_JELLYFIN_API_KEY
+          url: http://127.0.0.1:8096
+          key: {{KEY_JELLYFIN}}
