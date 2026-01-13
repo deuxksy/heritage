@@ -6,6 +6,43 @@
 
 **The Heritage Collection**은 단순한 관리를 넘어선 **'프라이빗 라이브러리 큐레이션'**의 완성을 목표로 하는 고급 미디어 아카이브 시스템입니다. 15년 차 DevOps 엔지니어이자 고급 미디어 큐레이터인 사용자를 위해 설계되었습니다.
 
+## 🗼 System Architecture
+
+```mermaid
+graph TD
+    %% Global Monitoring
+    Homepage[🛡️ Homepage: Command Center] --- Prowlarr
+    Homepage --- Whisparr
+    Homepage --- JDownloader
+    Homepage --- Jellyfin
+    subgraph "Phase 1: Discovery & Orchestration"
+        Prowlarr["🔍 Prowlarr: Search Gateway"] -- "Indexer Proxy" --> Whisparr
+        User(("🤵 Architect: Manual Discovery")) -- "Direct Link / Web" --> JDownloader
+        Whisparr["📂 Whisparr: Content Librarian"] -- "Manage Library & Metadata" --> Vault
+    end
+    subgraph "Phase 2: Acquisition Area (sda1)"
+        Whisparr -- "Automatic Trigger" --> ruTorrent["ruTorrent: P2P (Auto)"]
+        JDownloader["📥 JDownloader: Web (Manual)"] -- "Direct Inbound" --> sda1["/mnt/sda1: Temporary Staging"]
+        ruTorrent -- "Inbound Staging" --> sda1
+    end
+    subgraph "Phase 3: The Vault & Archive (sdb1)"
+        sda1 -- "Refinement: Move / Hardlink" --> sdb1["/mnt/sdb1: The Vault"]
+        sdb1 --> Stash["💎 Stash: Archive Vault (DB)"]
+        Stash -- "Tagging / Artist Mapping" --> Vault[("Final Curated Library")]
+    end
+    subgraph "Phase 4: Digital Theater"
+        Vault -- "Intel QSV Accelerated" --> Jellyfin["🎭 Jellyfin: The Grand Cinema"]
+        Jellyfin -- "Exhibition" --> EndUser((Gentleman Collector))
+    end
+    %% Styles
+    style Homepage fill:#f9f,stroke:#333,stroke-width:2px
+    style User fill:#fff,stroke:#333,stroke-width:2px
+    style sda1 fill:#fff4dd,stroke:#d4a017,stroke-dasharray: 5 5
+    style sdb1 fill:#e1f5fe,stroke:#01579b,stroke-width:3px
+    style Vault fill:#d1e7dd,stroke:#0f5132,stroke-width:2px
+    style Stash fill:#f8d7da,stroke:#842029
+```
+
 ## 🚀 Service Endpoints
 
 현재 구축되어 운영 중인 서비스 목록입니다. 통합 대시보드(Homepage)를 통해 모든 서비스에 접근할 수 있습니다.
