@@ -1,0 +1,53 @@
+# --- System & OS ---
+.DS_Store
+Thumbs.db
+*~
+*.swp
+*.swo
+.idea/
+.vscode/
+
+# --- Media Files (Safety Net) ---
+# 실수로 미디어 파일이 레포지토리에 포함되는 것을 방지
+*.mkv
+*.mp4
+*.avi
+*.mov
+*.wmv
+*.flv
+*.iso
+*.mp3
+*.flac
+*.wav
+*.aac
+*.jpg
+*.jpeg
+*.png
+*.gif
+*.webp
+
+# --- Logs & Temporary Data ---
+*.log
+*.tmp
+*.temp
+/tmp/
+/logs/
+/cache/
+
+# --- Application Specific Ignore ---
+# Stash/Jellyfin 등의 메타데이터 중 썸네일/캐시는 제외하고 설정(Config)만 보존
+**/cache/
+**/metadata/
+**/transcodes/
+
+# --- Podman/Docker ---
+podman.sock
+.env
+docker-compose.override.yml
+
+# --- Downloads/Mount Points ---
+# 마운트 포인트나 다운로드 디렉토리가 프로젝트 내부에 생성될 경우 제외
+downloads/
+completed/
+data/
+mnt/

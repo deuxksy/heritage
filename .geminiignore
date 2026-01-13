@@ -1,0 +1,29 @@
+# --- Version Control ---
+.git/
+
+# --- Media & Binary ---
+*.mkv
+*.mp4
+*.avi
+*.iso
+*.mp3
+*.flac
+*.jpg
+*.png
+*.gif
+*.webp
+*.db
+*.sqlite
+*.sqlite3
+
+# --- Logs & Cache ---
+*.log
+**/logs/
+**/cache/
+**/tmp/
+
+# --- Secrets ---
+.env
+*.key
+*.pem
+*.cert
