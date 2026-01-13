@@ -1,0 +1,116 @@
+version: '3.9'
+
+networks:
+  media-net:
+    name: media-net
+
+services:
+  # --- 🛡️ Infrastructure (관제 및 인프라) ---
+  homepage:
+    image: ghcr.io/gethomepage/homepage:latest
+    container_name: homepage
+    ports:
+      - "3000:3000"
+    volumes:
+      - /home/crong/heritage/homepage/config:/app/config
+      - /run/user/1000/podman/podman.sock:/var/run/docker.sock:ro # Podman User Socket
+      - /mnt:/mnt:ro # Storage 위젯용
+    networks:
+      - media-net
+    restart: unless-stopped
+
+  prowlarr:
+    image: ghcr.io/hotio/prowlarr:latest
+    container_name: prowlarr
+    ports:
+      - "9696:9696"
+    environment:
+      - PUID=1000
+      - PGID=1000
+    volumes:
+      - /home/crong/heritage/prowlarr:/config
+    networks:
+      - media-net
+    restart: unless-stopped
+
+  # --- 📥 Acquisition Engines (수집 엔진) ---
+  rtorrent-rutorrent:
+    image: crazymax/rtorrent-rutorrent:latest
+    container_name: rtorrent-rutorrent
+    environment:
+      - PUID=1000
+      - PGID=1000
+    ports:
+      - "8080:8080"
+    volumes:
+      - /home/crong/heritage/rtorrent:/data
+      - /mnt/data1/torrent:/downloads      # sda1: Inbound Staging (받는 곳)
+      - /mnt/data2/torrent:/completed_hdd2 # sdb1: The Vault (이동될 곳)
+    networks:
+      - media-net
+    restart: always
+
+  jdownloader:
+    image: jlesage/jdownloader-2
+    container_name: jdownloader
+    ports:
+      - "5800:5800"
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - JAVA_OPTIONS=-Xmx512m -Xms256m -XX:+UseSerialGC # N100 8G 최적화
+    volumes:
+      - /home/crong/heritage/jdownloader-2:/config
+      - /mnt/data1/torrent/jd2_downloads:/output # sda1 활용
+    mem_limit: 1g
+    networks:
+      - media-net
+    restart: unless-stopped
+
+  # --- 🏛️ Curatorial Tools (기록 및 분류) ---
+  whisparr:
+    image: ghcr.io/hotio/whisparr:latest
+    container_name: whisparr
+    ports:
+      - "6969:6969"
+    environment:
+      - PUID=1000
+      - PGID=1000
+    volumes:
+      - /home/crong/heritage/whisparr:/config
+      - /mnt/data1/torrent:/data1
+      - /mnt/data2/torrent:/data2
+    networks:
+      - media-net
+    restart: unless-stopped
+
+  stash:
+    image: stashapp/stash:latest
+    container_name: stash
+    ports:
+      - "9999:9999"
+    environment:
+      - STASH_CONFIG_FILE=/config/config.yml
+    volumes:
+      - /home/crong/heritage/stash:/config
+      - /mnt/data1/torrent:/data1
+      - /mnt/data2/torrent:/data2
+    networks:
+      - media-net
+    restart: unless-stopped
+
+  # --- 🎭 Digital Theater (전시 및 스트리밍) ---
+  jellyfin:
+    image: jellyfin/jellyfin:latest
+    container_name: jellyfin
+    ports:
+      - "8096:8096"
+    devices:
+      - /dev/dri/renderD128:/dev/dri/renderD128 # Intel QSV 가속
+    volumes:
+      - /home/crong/heritage/jellyfin:/config
+      - /mnt/data1/torrent:/data1
+      - /mnt/data2/torrent:/data2
+    networks:
+      - media-net
+    restart: unless-stopped
