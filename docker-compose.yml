@@ -18,6 +18,8 @@ services:
     networks:
       - media-net
     restart: unless-stopped
+    environment:
+      - HOMEPAGE_ALLOWED_HOSTS=*
 
   prowlarr:
     image: ghcr.io/hotio/prowlarr:latest

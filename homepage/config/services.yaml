@@ -7,7 +7,7 @@
         widget:
           type: prowlarr
           url: http://prowlarr:9696
-          key: YOUR_PROWLARR_API_KEY
+          key: {{KEY_PROWLARR}}
 
 - Acquisition Engines:
     - ruTorrent:
@@ -36,7 +36,7 @@
         widget:
           type: whisparr
           url: http://whisparr:6969
-          key: YOUR_WHISPARR_API_KEY
+          key: {{KEY_WHISPARR}}
     - Stash:
         label: "Archive Vault"
         icon: stash.png
