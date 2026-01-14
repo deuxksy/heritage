@@ -12,6 +12,11 @@ services:
     restart: unless-stopped
     # 호스트의 네트워크 인터페이스(enp3s0, tailscale0 등)에 직접 접근하기 위해 필요
     network_mode: host
+    security_opt:
+      - label=disable
+      - unmask=ALL
+    cap_add:
+       - SYS_ADMIN
     environment:
       - PUID=1000
       - PGID=1000
@@ -22,9 +27,15 @@ services:
     volumes:
       - /home/crong/git/heritage/homepage/config:/app/config:Z
       # Podman User Socket: Homepage 내부의 Docker 위젯이 컨테이너 상태를 읽을 수 있게 함
-      - /run/user/1000/podman/podman.sock:/var/run/docker.sock:ro
-      # Storage 위젯용: N100 NAS의 디스크 사용량을 대시보드에 표시
-      - /mnt:/mnt:ro:,z
+      - /run/user/1000/podman/podman.sock:/var/run/docker.sock:ro,z
+      # 호스트의 루트(/)를 컨테이너의 /host로 매핑 (통계 읽기용)
+      - /:/host:ro,z
+      # 실제 데이터 HDD 매핑
+      - /mnt/data1:/host/mnt/data1:ro,z
+      - /mnt/data2:/host/mnt/data2:ro,z
+      # 아래 경로를 추가하여 systeminformation 라이브러리가 호스트 정보를 읽게 합니다.
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
 
   prowlarr:
     # 공식 GitHub 레지스트리 이미지 사용 (가장 빠르고 정확한 업데이트)
@@ -170,9 +181,11 @@ services:
     image: docker.io/jellyfin/jellyfin:latest
     container_name: jellyfin
     restart: unless-stopped
+    # 1. 호스트의 UID/GID(1000)를 컨테이너 내부에서도 그대로 유지
+    userns: "keep-id"
     # 1. 하드웨어 가속을 위한 그룹 권한 (Fedora의 render 그룹 GID 확인 필요)
-    # group_add:
-    #   - "107" # 보통 Fedora/CentOS에서 render 그룹의 GID입니다. 'getent group render'로 확인하세요.
+    group_add:
+      - "keep-groups"
     ports:
       - "8096:8096"
     devices:
