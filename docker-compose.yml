@@ -20,11 +20,11 @@ services:
       # Podman 사용 시 Docker API 응답을 위해 필요한 경우 추가
       #- DOCKER_RENAME_CONTAINERS=true
     volumes:
-      - /home/crong/git/heritage/homepage/config:/app/config
+      - /home/crong/git/heritage/homepage/config:/app/config:Z
       # Podman User Socket: Homepage 내부의 Docker 위젯이 컨테이너 상태를 읽을 수 있게 함
       - /run/user/1000/podman/podman.sock:/var/run/docker.sock:ro
       # Storage 위젯용: N100 NAS의 디스크 사용량을 대시보드에 표시
-      - /mnt:/mnt:ro
+      - /mnt:/mnt:ro:,z
 
   prowlarr:
     # 공식 GitHub 레지스트리 이미지 사용 (가장 빠르고 정확한 업데이트)
@@ -41,9 +41,9 @@ services:
       - COMPlus_EnableDiagnostics=0
     volumes:
       # 설정 및 SQLite DB 저장소
-      - /home/crong/heritage/prowlarr:/config
+      - /home/crong/git/heritage/prowlarr:/config:Z
       # (선택 사항) 대규모 인덱싱 시 로그 파일이 N100 NAS의 시스템 디스크를 채우지 않도록 별도 관리 권장
-      - /home/crong/logs/heritage/prowlarr:/config/logs
+      - /home/crong/logs/heritage/prowlarr:/config/logs:Z
     # N100 8G 메모리 효율을 위한 가이드라인
     mem_limit: 1g
     networks:
@@ -51,7 +51,7 @@ services:
 
   # --- 📥 Acquisition Engines (수집 엔진 업그레이드) ---
   torrent: # 서비스 명칭 단일화
-    image: docker.io/crazymax/rtorrent-rutorrent:latest # Flood UI가 내장된 고성능 아키텍처
+    image: docker.io/crazymax/rtorrent-rutorrent  # 호환성이 검증된 hotio 이미지로 교체
     container_name: torrent
     # 1. 고부하 시 소켓 부족 방지 (DevOps 필수 설정)
     ulimits:
@@ -70,9 +70,9 @@ services:
       - "50000:50000" # Peer 통신용 (TCP)
       - "6881:6881/udp" # DHT용
     volumes:
-      - /home/crong/heritage/torrent:/data
-      - /mnt/data1/torrent:/downloads
-      - /mnt/data2/torrent:/completed_hdd2
+      - /home/crong/git/heritage/torrent:/data:Z
+      - /mnt/data1/torrent:/downloads:z
+      - /mnt/data2/torrent:/completed_hdd2:z
     # 2. Podman 환경에서의 안정성을 위한 헬스체크 대기 시간
     stop_grace_period: 30s
     networks:
@@ -102,11 +102,11 @@ services:
       - JAVA_OPTIONS=-Xmx512m -Xms256m -XX:+UseSerialGC -Djava.awt.headless=false
 
       # 4. MyJDownloader 연동 (선택 사항: 원격 제어를 위해 권장)
-      - MYJDOWNLOADER_EMAIL=ksymailing@gmail.com
-      - MYJDOWNLOADER_PASSWORD=@yesd03020
+      #- MYJDOWNLOADER_EMAIL=ksymailing@gmail.com
+      #- MYJDOWNLOADER_PASSWORD=
     volumes:
       - /home/crong/git/heritage/jdownloader-2:/config:Z # Fedora SELinux 대응
-      - /mnt/data1/torrent/jd2_downloads:/output:Z      # 다운로드 저장소 (sda1)
+      - /mnt/data1/torrent/jd2_downloads:/output:z      # 다운로드 저장소 (sda1)
     # N100 메모리 보호를 위한 제한
     mem_limit: 1g
     networks:
@@ -127,10 +127,10 @@ services:
       - UMASK=002              # 파일 권한 무결성을 위한 표준 설정
       - COMPlus_EnableDiagnostics=0 # .NET 진단 비활성화 (리소스 절약)
     volumes:
-      - /home/crong/git/heritage/whisparr:/config
+      - /home/crong/git/heritage/whisparr:/config:Z
       # 데이터 볼륨 (N100 I/O 부하 관리를 위해 필요 시 전용 마운트 고려)
-      - /mnt/data1/torrent:/data1
-      - /mnt/data2/torrent:/data2
+      - /mnt/data1/torrent:/data1:z
+      - /mnt/data2/torrent:/data2:z
     mem_limit: 1g             # N100 8G 환경을 고려한 메모리 캡
     networks:
       - media-net
@@ -153,13 +153,13 @@ services:
       # 하드웨어 가속을 위한 FFmpeg 환경변수 (이미지 내부 기본값이나 명시 권장)
       - STASH_FFMPEG_PATH=/usr/bin/ffmpeg
     volumes:
-      - /home/crong/git/heritage/stash:/config
+      - /home/crong/git/heritage/stash:/config:Z
       # 3. 데이터 구조 최적화 (사용자 정의 경로 유지)
-      - /mnt/data1/torrent:/data1
-      - /mnt/data2/torrent:/data2
+      - /mnt/data1/torrent:/data1:z
+      - /mnt/data2/torrent:/data2:Z
       # 4. 캐시 및 생성 파일 전용 볼륨 (성능 향상을 위해 권장)
-      - /home/crong/git/heritage/stash/cache:/cache
-      - /home/crong/git/heritage/stash/generated:/generated
+      - /home/crong/git/heritage/stash/cache:/cache:Z
+      - /home/crong/git/heritage/stash/generated:/generated:Z
     # 5. 미디어 인덱싱 시 I/O 부하 관리를 위한 리소스 제한 (N100 8G 배려)
     mem_limit: 2g
     networks:
@@ -187,8 +187,8 @@ services:
     volumes:
       - /home/crong/git/heritage/jellyfin/config:/config:Z
       - /home/crong/git/heritage/jellyfin/cache:/cache:Z # 트랜스코딩 부하 분산을 위한 별도 캐시
-      - /mnt/data1/torrent:/data1:ro # 읽기 전용으로 안전하게 연결
-      - /mnt/data2/torrent:/data2:ro
+      - /mnt/data1/torrent:/data1:ro,z # 읽기 전용으로 안전하게 연결
+      - /mnt/data2/torrent:/data2:ro,z
     # 4. N100 8G 메모리 효율을 위한 제한
     mem_limit: 2g
     networks:
