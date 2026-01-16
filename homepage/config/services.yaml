@@ -9,26 +9,26 @@
         container: prowlarr
         widget:
           type: prowlarr
-          url: http://127.0.0.1:9696
-          key: {{KEY_PROWLARR}}
+          url: http://{{NAS_IP}}:9696
+          key: { { KEY_PROWLARR } }
 
 - Acquisition Engines:
     - Torrent:
         label: "Acquistion Node"
-        icon: torrent.png
+        icon: rutorrent.png
         href: http://{{NAS_IP}}:8080
         container: torrent
         widget:
-          type: torrent
-          url: http://127.0.0.1:8000
-    - JDownloader:
-        label: "Web Collector"
-        icon: jdownloader.png
-        href: http://{{NAS_IP}}:5800
-        container: jdownloader
-        widget:
-          type: jdownloader
-          url: http://127.0.0.1:5800
+          type: rutorrent
+          url: http://{{NAS_IP}}:8080
+#    - JDownloader:
+#        label: "Web Collector"
+#        icon: jdownloader.png
+#        href: http://{{NAS_IP}}:5800
+#        container: jdownloader
+#        widget:
+#          type: jdownloader
+#          url: http://127.0.0.1:5800
 
 - Curatorial Tools:
     - Whisparr:
@@ -37,9 +37,10 @@
         href: http://{{NAS_IP}}:6969
         container: whisparr
         widget:
-          type: whisparr
-          url: http://127.0.0.1:6969
-          key: {{KEY_WHISPARR}}
+          type: radarr
+          url: http://{{NAS_IP}}:6969
+          key: { { KEY_WHISPARR } }
+
     - Stash:
         label: "Archive Vault"
         icon: stash.png
@@ -47,8 +48,9 @@
         container: stash
         widget:
           type: stash
-          url: http://127.0.0.1:9999
-          key: {{KEY_STASH}}
+          url: http://{{NAS_IP}}:9999
+          key: { { KEY_STASH } }
+          fields: ["scenes", "performers", "studios", "galleries"]
 
 - Digital Theater:
     - Jellyfin:
@@ -59,4 +61,31 @@
         widget:
           type: jellyfin
           url: http://127.0.0.1:8096
-          key: {{KEY_JELLYFIN}}
+          key: { { KEY_JELLYFIN } }
+
+- Tailscale:
+    - Deneb:
+        icon: tailscale.png
+        widget:
+          type: tailscale
+          deviceid: { { DEVICEID_DENEB } }
+          key: { { KEY_TAILSCALE } }
+    - Agrias:
+        icon: tailscale.png
+        widget:
+          type: tailscale
+          deviceid: { { DEVICEID_AGRIAS } }
+          key: { { KEY_TAILSCALE } }
+    - Deck:
+        icon: tailscale.png
+        widget:
+          type: tailscale
+          deviceid: { { DEVICEID_DECK } }
+          key: { { KEY_TAILSCALE } }
+
+    - Mini:
+        icon: tailscale.png
+        widget:
+          type: tailscale
+          deviceid: { { DEVICEID_MINI } }
+          key: { { KEY_TAILSCALE } }
