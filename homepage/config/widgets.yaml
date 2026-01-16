@@ -37,8 +37,8 @@
 # 2. 호치민 실시간 날씨 위젯 (Open-Meteo)
 - openmeteo:
     label: "Ho Chi Minh City"
-    latitude: { { LATITUDE } } # 호치민 중심부 위도
-    longitude: { { LONGITUDE } } # 호치민 중심부 경도
+    latitude: {{HOMEPAGE_VAR_LATITUDE}} # 호치민 중심부 위도
+    longitude: {{HOMEPAGE_VAR_LONGITUDE}} # 호치민 중심부 경도
     units: metric # 섭씨(°C) 단위 사용
-    cache: 15 # N100 자원 절약을 위한 15분 캐시 설정
+    cache: 15
 

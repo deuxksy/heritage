@@ -5,26 +5,26 @@
     - Prowlarr:
         label: "Search Gateway"
         icon: prowlarr.png
-        href: http://{{NAS_IP}}:9696
+        href: http://{{HOMEPAGE_VAR_NAS_IP}}:9696
         container: prowlarr
         widget:
           type: prowlarr
-          url: http://{{NAS_IP}}:9696
-          key: { { KEY_PROWLARR } }
+          url: http://{{HOMEPAGE_VAR_NAS_IP}}:9696
+          key: {{HOMEPAGE_VAR_KEY_PROWLARR}}
 
 - Acquisition Engines:
     - Torrent:
         label: "Acquistion Node"
         icon: rutorrent.png
-        href: http://{{NAS_IP}}:8080
+        href: http://{{HOMEPAGE_VAR_NAS_IP}}:8080
         container: torrent
         widget:
           type: rutorrent
-          url: http://{{NAS_IP}}:8080
+          url: http://{{HOMEPAGE_VAR_NAS_IP}}:8080
 #    - JDownloader:
 #        label: "Web Collector"
 #        icon: jdownloader.png
-#        href: http://{{NAS_IP}}:5800
+#        href: http://{{HOMEPAGE_VAR_NAS_IP}}:5800
 #        container: jdownloader
 #        widget:
 #          type: jdownloader
@@ -34,58 +34,58 @@
     - Whisparr:
         label: "Content Librarian"
         icon: whisparr.png
-        href: http://{{NAS_IP}}:6969
+        href: http://{{HOMEPAGE_VAR_NAS_IP}}:6969
         container: whisparr
         widget:
           type: radarr
-          url: http://{{NAS_IP}}:6969
-          key: { { KEY_WHISPARR } }
+          url: http://{{HOMEPAGE_VAR_NAS_IP}}:6969
+          key: {{HOMEPAGE_VAR_KEY_WHISPARR}}
 
     - Stash:
         label: "Archive Vault"
         icon: stash.png
-        href: http://{{NAS_IP}}:9999
+        href: http://{{HOMEPAGE_VAR_NAS_IP}}:9999
         container: stash
         widget:
           type: stash
-          url: http://{{NAS_IP}}:9999
-          key: { { KEY_STASH } }
+          url: http://{{HOMEPAGE_VAR_NAS_IP}}:9999
+          key: {{HOMEPAGE_VAR_KEY_STASH}}
           fields: ["scenes", "performers", "studios", "galleries"]
 
 - Digital Theater:
     - Jellyfin:
         label: "The Grand Cinema"
         icon: jellyfin.png
-        href: http://{{NAS_IP}}:8096
+        href: http://{{HOMEPAGE_VAR_NAS_IP}}:8096
         container: jellyfin
         widget:
           type: jellyfin
           url: http://127.0.0.1:8096
-          key: { { KEY_JELLYFIN } }
+          key: {{HOMEPAGE_VAR_KEY_JELLYFIN}}
 
 - Tailscale:
     - Deneb:
         icon: tailscale.png
         widget:
           type: tailscale
-          deviceid: { { DEVICEID_DENEB } }
-          key: { { KEY_TAILSCALE } }
+          deviceid: {{HOMEPAGE_VAR_DEVICEID_DENEB}}
+          key: {{HOMEPAGE_VAR_KEY_TAILSCALE}}
     - Agrias:
         icon: tailscale.png
         widget:
           type: tailscale
-          deviceid: { { DEVICEID_AGRIAS } }
-          key: { { KEY_TAILSCALE } }
+          deviceid: {{HOMEPAGE_VAR_DEVICEID_AGRIAS}}
+          key: {{HOMEPAGE_VAR_KEY_TAILSCALE}}
     - Deck:
         icon: tailscale.png
         widget:
           type: tailscale
-          deviceid: { { DEVICEID_DECK } }
-          key: { { KEY_TAILSCALE } }
+          deviceid: {{HOMEPAGE_VAR_DEVICEID_DECK}}
+          key: {{HOMEPAGE_VAR_KEY_TAILSCALE}}
 
     - Mini:
         icon: tailscale.png
         widget:
           type: tailscale
-          deviceid: { { DEVICEID_MINI } }
-          key: { { KEY_TAILSCALE } }
+          deviceid: {{HOMEPAGE_VAR_DEVICEID_MINI}}
+          key: {{HOMEPAGE_VAR_KEY_TAILSCALE}}
