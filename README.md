@@ -92,4 +92,33 @@ Homepage 대시보드의 실시간 위젯 기능을 활성화하려면 각 서�
 *   **Gentlemanly Terminology:** 품격 있는 용어 사용 (예: '프라이빗 큐레이션', '시네마틱 아카이브').
 *   **Performance:** I/O Wait 최소화 및 하드링크 우선 적용.
 
-자세한 기술 명세와 설정 파일은 [ContextFile.md](./ContextFile.md)를, AI 어시스턴트 지침은 [GEMINI.md](./GEMINI.md)를 참조하십시오.
+## 🤖 AI Assistant Configuration
+
+프로젝트는 다양한 AI 어시스턴트(GEMINI, Cline, Z-AI)와 함께 작동하도록 구성되어 있습니다.
+
+### 파일 구조
+
+```
+.ai/
+├── AI.ignore          # 공통 파일 무시 패턴
+├── CONTEXT.md         # 프로젝트 기술 사양 및 문맥 (SSoT)
+└── RULES.md           # 공통 AI 가이드라인 (최상위 지침)
+
+# 루트 디렉토리 Symbolic Links
+GEMINI.md      → .ai/RULES.md    (공통 AI 가이드라인)
+.clinerules    → .ai/RULES.md    (Cline 규칙)
+.clineignore   → .ai/AI.ignore    (Cline 무시 패턴)
+.geminiignore → .ai/AI.ignore    (GEMINI 무시 패턴)
+```
+
+### AI별 참조 구조
+
+- **GEMINI**: `GEMINI.md` → `.ai/RULES.md` + `.ai/CONTEXT.md`
+- **Cline**: `.clinerules` → `.ai/RULES.md`, `.clineignore` → `.ai/AI.ignore` + `.ai/CONTEXT.md`
+- **Z-AI**: `.ai/RULES.md` + `.ai/CONTEXT.md` (별도 설정 파일 없음)
+
+### 공통 설정 파일
+
+- **[.ai/RULES.md](./.ai/RULES.md)**: 모든 AI가 따르는 최상위 운영 지침
+- **[.ai/CONTEXT.md](./.ai/CONTEXT.md)**: 프로젝트 기술 명세 및 구성 (단일 진실 공급원)
+- **[.ai/AI.ignore](./.ai/AI.ignore)**: AI가 무시해야 할 파일 패턴
