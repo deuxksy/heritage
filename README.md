@@ -94,7 +94,7 @@ Homepage 대시보드의 실시간 위젯 기능을 활성화하려면 각 서�
 
 ## 🤖 AI Assistant Configuration
 
-프로젝트는 다양한 AI 어시스턴트(GEMINI, Cline, Z-AI)와 함께 작동하도록 구성되어 있습니다.
+프로젝트는 다양한 AI 어시스턴트(GEMINI, Cline, GitHub Copilot)와 함께 작동하도록 구성되어 있습니다.
 
 ### 파일 구조
 
@@ -109,6 +109,7 @@ GEMINI.md      → .ai/RULES.md    (공통 AI 가이드라인)
 .clinerules    → .ai/RULES.md    (Cline 규칙)
 .clineignore   → .ai/AI.ignore    (Cline 무시 패턴)
 .geminiignore → .ai/AI.ignore    (GEMINI 무시 패턴)
+.github/copilot-instructions.md → .ai/RULES.md (GitHub Copilot 규칙)
 ```
 
 ### AI별 참조 구조
