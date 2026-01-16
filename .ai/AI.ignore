@@ -38,8 +38,6 @@
 *.lock
 
 # --- Secrets ---
-.env
-.env.*
 *.key
 *.pem
 *.cert
