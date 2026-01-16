@@ -65,6 +65,33 @@ Homepage 대시보드의 실시간 위젯 기능을 활성화하려면 각 서�
 2.  **설정 적용:** `homepage/config/services.yaml` 파일을 열어 해당 서비스의 `key:` 필드에 붙여넣습니다.
 3.  **재시작:** `podman restart homepage`
 
+## 🔧 환경변수 설정 (Environment Variables)
+
+Homepage 대시보드는 `.env` 파일을 통해 시스템 전체 환경변수를 관리합니다.
+
+### 환경변수 목록
+
+| 환경변수 | 설명 | 대상 서비스 |
+|----------|------|-------------|
+| `HOMEPAGE_VAR_NAS_IP` | NAS 내부 IP 주소 | 전체 서비스 |
+| `HOMEPAGE_VAR_KEY_PROWLARR` | Prowlarr API Key | Prowlarr 위젯 |
+| `HOMEPAGE_VAR_KEY_WHISPARR` | Whisparr API Key | Whisparr 위젯 |
+| `HOMEPAGE_VAR_KEY_STASH` | Stash API Key | Stash 위젯 |
+| `HOMEPAGE_VAR_KEY_JELLYFIN` | Jellyfin API Key | Jellyfin 위젯 |
+| `HOMEPAGE_VAR_KEY_TAILSCALE` | Tailscale API Key | Tailscale 위젯 |
+| `HOMEPAGE_VAR_DEVICEID_DENEB` | Tailscale 장치 ID (Deneb) | Tailscale 위젯 |
+| `HOMEPAGE_VAR_DEVICEID_AGRIAS` | Tailscale 장치 ID (Agrias) | Tailscale 위젯 |
+| `HOMEPAGE_VAR_DEVICEID_DECK` | Tailscale 장치 ID (Deck) | Tailscale 위젯 |
+| `HOMEPAGE_VAR_DEVICEID_MINI` | Tailscale 장치 ID (Mini) | Tailscale 위젯 |
+| `HOMEPAGE_VAR_LATITUDE` | 날씨 위젯 위도 | Open-Meteo 위젯 |
+| `HOMEPAGE_VAR_LONGITUDE` | 날씨 위젯 경도 | Open-Meteo 위젯 |
+
+### 설정 방법
+
+1.  **.env 파일 생성:** `.env` 파일은 `.gitignore`에 포함되어 있으므로 수동으로 생성합니다.
+2.  **변수 등록:** 위 표의 환경변수와 실제 값을 `.env` 파일에 `KEY=VALUE` 형식으로 등록합니다.
+3.  **적용 확인:** `podman restart homepage` 명령어로 컨테이너를 재시작합니다.
+
 ## 핵심 인프라 (Core Infrastructure)
 
 *   **OS:** Fedora 43
